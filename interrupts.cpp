@@ -24,10 +24,10 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
         auto [activity, duration_intr, program_name] = parse_trace(trace);
 
-        if(activity == "CPU") { //As per Assignment 1
+        if(activity == "CPU") { 
             execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) + ", CPU Burst\n";
             current_time += duration_intr;
-        } else if(activity == "SYSCALL") { //As per Assignment 1
+        } else if(activity == "SYSCALL") { 
             auto [intr, time] = intr_boilerplate(current_time, duration_intr, 10, vectors);
             execution += intr;
             current_time = time;
@@ -55,17 +55,17 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             ///////////////////////////////////////////////////////////////////////////////////////////
             //Add your FORK output here
             
-            // Step 1: ISR clones the PCB (duration from trace file)
+            //ISR clones the PCB (duration from trace file)
             execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) + ", cloning the PCB\n";
             current_time += duration_intr;
             
             // Create child process - clone parent's info with new PID
             PCB child(next_pid++, current.PID, current.program_name, current.size, current.partition_number);
             
-            // Step 2: Call scheduler (duration = 0)
+            //Call scheduler (duration = 0)
             execution += std::to_string(current_time) + ", 0, scheduler called\n";
             
-            // Step 3: Return from ISR (IRET)
+            // Return from ISR (IRET)
             execution += std::to_string(current_time) + ", 1, IRET\n";
             current_time += 1;
             
@@ -167,7 +167,7 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             ///////////////////////////////////////////////////////////////////////////////////////////
             //Add your EXEC output here
 
-            // Step 1: ISR searches file in external_files and gets memory size
+            // ISR searches file in external_files and gets memory size
             unsigned int program_size = get_size(program_name, external_files);
             if(program_size == (unsigned int)-1) {
                 std::cerr << "ERROR: Program " << program_name << " not found in external files!" << std::endl;
@@ -177,12 +177,12 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) + ", Program is " + std::to_string(program_size) + " Mb large\n";
             current_time += duration_intr;
             
-            // Step 2: Simulate execution of the loader (15ms per MB)
+            //Simulate execution of the loader (15ms per MB)
             int load_time = program_size * 15;
             execution += std::to_string(current_time) + ", " + std::to_string(load_time) + ", loading program into memory\n";
             current_time += load_time;
             
-            // Step 3: Free old partition and find empty partition where executable fits
+            //Free old partition and find empty partition where executable fits
             if(current.partition_number != -1) {
                 free_memory(&current);
             }
@@ -197,20 +197,20 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
                 break;
             }
             
-            // Step 4: Mark partition as occupied (random 1-10ms)
+            //Mark partition as occupied (random 1-10ms)
             int mark_time = (rand() % 10) + 1;
             execution += std::to_string(current_time) + ", " + std::to_string(mark_time) + ", marking partition as occupied\n";
             current_time += mark_time;
             
-            // Step 5: Update PCB with new information (random 1-10ms)
+            //Update PCB with new information (random 1-10ms)
             int update_time = (rand() % 10) + 1;
             execution += std::to_string(current_time) + ", " + std::to_string(update_time) + ", updating PCB\n";
             current_time += update_time;
             
-            // Step 6: Call scheduler (duration = 0)
+            //Call scheduler (duration = 0)
             execution += std::to_string(current_time) + ", 0, scheduler called\n";
             
-            // Step 7: Return from ISR (IRET)
+            // Return from ISR (IRET)
             execution += std::to_string(current_time) + ", 1, IRET\n";
             current_time += 1;
             
@@ -271,12 +271,12 @@ int main(int argc, char** argv) {
     auto [vectors, delays, external_files] = parse_args(argc, argv);
     std::ifstream input_file(argv[1]);
 
-    //Just a sanity check to know what files you have
+    //check to know what files you have
     print_external_files(external_files);
 
-    //Make initial PCB (notice how partition is not assigned yet)
+    //Make initial PCB 
     PCB current(0, -1, "init", 1, -1);
-    //Update memory (partition is assigned here, you must implement this function)
+    //Update memory
     if(!allocate_memory(&current)) {
         std::cerr << "ERROR! Memory allocation failed!" << std::endl;
     }
