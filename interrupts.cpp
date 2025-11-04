@@ -61,7 +61,11 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             
             // Create child process - clone parent's info with new PID
             PCB child(next_pid++, current.PID, current.program_name, current.size, current.partition_number);
-            
+            // Allocate memory for child process
+            if(!allocate_memory(&child)) {
+                std::cerr << "ERROR! Memory allocation failed for child process!" << std::endl;
+                 break;
+            }
             //Call scheduler (duration = 0)
             execution += std::to_string(current_time) + ", 0, scheduler called\n";
             
@@ -129,7 +133,7 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
                 delays,
                 external_files,
                 child,
-                {}  // Child starts with empty wait queue
+                wait_queue  // Child starts with empty wait queue
             );
             
             execution += child_exec;
